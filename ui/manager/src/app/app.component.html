@@ -1,0 +1,72 @@
+<div class="app">
+  <header class="app-header">
+    <p class="app-title">Transaction Manager</p>
+  </header>
+  <div class="search-container">
+    <form [formGroup]="transactionForm" (ngSubmit)="getTransactions()">
+      <div class="account-info">
+        <div class="form-label">
+          <label>Account Information</label>
+        </div>
+        <div class="form-fields">
+          <input type="text" placeholder="Account number" formControlName="account">
+          <input type="text" placeholder="First name" formControlName="first">
+          <input type="text" placeholder="Last name" formControlName="last">
+        </div>
+      </div>
+      <div class="merchant-info">
+        <div class="form-label">
+          <label>Merchant Information</label>
+        </div>
+        <div class="form-fields">
+          <input type="text" placeholder="Merchant name" formControlName="merchant">
+          <input type="text" placeholder="Issuer" formControlName="issuer">
+          <input type="text" placeholder="Acquirer" formControlName="acquirer">
+        </div>
+      </div>
+      <button type="submit">Search</button>
+    </form>
+  </div>
+  <div class="pagination-container">
+    <div class="results-title">
+      <label>Transaction Results</label>
+    </div>
+    <div class="pagination-controls">
+      <button [disabled]="totalPages == 0 || page <= 1" (click)="prevPage()">&lt;</button>
+      <label>{{page}} of {{totalPages}}</label>
+      <button [disabled]="totalPages == 0 || page >= totalPages" (click)="nextPage()">&gt;</button>
+    </div>
+  </div>
+  <div class="transactions-container">
+    <table class="transactions-table">
+      <tr *ngIf="transactions.length > 0">
+        <th>Account</th>
+        <th>Merchant</th>
+        <th>Transaction Details</th>
+      </tr>
+      <tr 
+        class="content-row"
+        *ngFor="let t of transactions.slice((page - 1) * transactionsPerPage, page * transactionsPerPage)" 
+        (click)="rowExpand(t)">
+        <td class="table-col">
+          <label>{{t.transaction.account.accountNumber}}</label>
+          <label *ngIf="t.expanded">{{t.transaction.account.firstName}} {{t.transaction.account.lastName}}</label>
+        </td>
+        <td class="table-col">
+          <label>{{t.transaction.merchant.merchantName}}</label>
+          <label *ngIf="t.expanded">{{t.transaction.merchant.issuer}}</label>
+          <label *ngIf="t.expanded">{{t.transaction.merchant.acquirer}}</label>
+        </td>
+        <td class="table-col">
+          <label>${{t.transaction.details.value}} on {{t.transaction.details.date.slice(0, 10)}}</label>
+          <label *ngIf="t.expanded">{{t.transaction.details.status ? "Success" : t.transaction.details.statusMessage}}</label>
+        </td>
+      </tr>
+    </table>
+    <div class="transactions-table-empty" *ngIf="transactions.length <= 0">
+      No transactions matched your search criteria.
+    </div>
+  </div>
+</div>
+
+<router-outlet></router-outlet>
